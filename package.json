@@ -10,5 +10,9 @@
     "start": "node index.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/core": "^0.5.2",
+    "discord.js": "^14.8.0"
+  }
 }

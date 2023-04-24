@@ -1,0 +1,14 @@
+{
+  "name": "d-daybot",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "디스코드 D-day 봇",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

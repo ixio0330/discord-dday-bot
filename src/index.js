@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import Discord from 'discord.js';
+import dataset from './data.json' assert { type: "json" };
 
 // dotenv 로드
 dotenv.config();
@@ -13,30 +14,41 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
   try {
     const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
-
-    // 최초로 1번 공지
-    channel.send(`
-📅 일정 공지
-정보처리기사 실기
-
-√ 시험 접수 D-${getDateDif(process.env.EXAM_REGISTER, getToday())}
-√ 시험 D-${getDateDif(process.env.EXAM_DATE, getToday())}  
-    `)
+    
+    // 최초 1회 공지
+    dataset.map(data => channel.send(genDdayMessage(data)));
 
     // 매일 공지
     setInterval(() => {
-      channel.send(`
-📅 일정 공지
-정보처리기사 실기
-
-√ 시험 접수 D-${getDateDif(process.env.EXAM_REGISTER, getToday())}
-√ 시험 D-${getDateDif(process.env.EXAM_DATE, getToday())}  
-      `);
+      dataset.map(data => channel.send(genDdayMessage(data)));
     }, (1000 * 60 * 60 * 24));
   } catch (error) {
     console.error(error);
   }
 });
+
+//#region 메시지 출력 utils function
+function genDdayMessage(info = {}) {
+  const { title, description, date, text, icon } = info;
+  const str = `
+${title ?? '📅 일정 공지'}
+${description}
+  
+${ 
+  Array.isArray(date) ? 
+  genDdayList(date) : 
+  `${icon ? `${icon} `: ''}${text} D-${getDateDif(date, getToday())}`
+}
+`;
+  return str;
+}
+
+function genDdayList(dateList = []) {
+  return dateList.map(({ text, date, icon }) => 
+      `${icon ? `${icon} `: ''}${text} D-${getDateDif(date, getToday())}`)
+      .join('\n');
+}
+//#endregion
 
 //#region 시간 계산 utils function
 function getToday() {

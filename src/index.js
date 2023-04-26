@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import Discord from 'discord.js';
 import dataset from './data.json' assert { type: "json" };
+import cron from 'node-cron';
 
 // dotenv 로드
 dotenv.config();
@@ -14,14 +15,13 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
   try {
     const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
-    
-    // 최초 1회 공지
-    dataset.map(data => channel.send(genDdayMessage(data)));
 
-    // 매일 공지
-    setInterval(() => {
-      dataset.map(data => channel.send(genDdayMessage(data)));
-    }, (1000 * 60 * 60 * 24));
+    // 스케줄러로 설정 시간에 공지
+    dataset.map(data => {
+      cron.schedule(data.cronExp ?? '0 0 9 * * *', () => {
+        channel.send(genDdayMessage(data))
+      });
+    });
   } catch (error) {
     console.error(error);
   }
